@@ -1,4 +1,4 @@
 @php 
-    /** @var string */
-    $database = config('database.default');
+    $name = 'Thibaud';
+    $age = 18;
 @endphp

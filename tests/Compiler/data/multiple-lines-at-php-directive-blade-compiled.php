@@ -1,6 +1,6 @@
 <?php
 
 /** file: multiple-lines-at-php-directive.blade.php, line: 2 */
-/** @var string */
+$name = 'Thibaud';
 /** file: multiple-lines-at-php-directive.blade.php, line: 3 */
-$database = config('database.default');
+$age = 18;
