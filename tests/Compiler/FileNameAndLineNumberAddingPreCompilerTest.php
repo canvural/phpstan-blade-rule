@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Vural\PHPStanBladeRule\Tests\Compiler;
 
 use Generator;
-use PHPUnit\Framework\TestCase;
+use PHPStan\Testing\PHPStanTestCase;
 use Vural\PHPStanBladeRule\Compiler\FileNameAndLineNumberAddingPreCompiler;
 
+use function array_merge;
+
 /** @covers \Vural\PHPStanBladeRule\Compiler\FileNameAndLineNumberAddingPreCompiler */
-class FileNameAndLineNumberAddingPreCompilerTest extends TestCase
+class FileNameAndLineNumberAddingPreCompilerTest extends PHPStanTestCase
 {
     private FileNameAndLineNumberAddingPreCompiler $compiler;
 
@@ -17,7 +19,13 @@ class FileNameAndLineNumberAddingPreCompilerTest extends TestCase
     {
         parent::setUp();
 
-        $this->compiler = new FileNameAndLineNumberAddingPreCompiler();
+        $this->compiler = self::getContainer()->getByType(FileNameAndLineNumberAddingPreCompiler::class);
+    }
+
+    /** @return string[] */
+    public static function getAdditionalConfigFiles(): array
+    {
+        return array_merge(parent::getAdditionalConfigFiles(), [__DIR__ . '/config/configWithTemplatePaths.neon']);
     }
 
     /**
@@ -26,7 +34,7 @@ class FileNameAndLineNumberAddingPreCompilerTest extends TestCase
      */
     function it_will_add_file_name_and_line_number_for_basic_templates(string $raw, string $expected): void
     {
-        $this->compiler->setFileName('foo.blade.php');
+        $this->compiler->setFileName('/var/www/resources/views/foo.blade.php');
 
         $this->assertSame(
             $expected,
@@ -37,17 +45,28 @@ class FileNameAndLineNumberAddingPreCompilerTest extends TestCase
     /** @test */
     function it_can_change_file_name_for_same_template(): void
     {
-        $this->compiler->setFileName('foo.blade.php');
+        $this->compiler->setFileName('/var/www/resources/views/foo.blade.php');
 
         $this->assertSame(
             '/** file: foo.blade.php, line: 1 */{{ $foo }}',
             $this->compiler->compileString('{{ $foo }}')
         );
 
-        $this->compiler->setFileName('bar.blade.php');
+        $this->compiler->setFileName('/var/www/resources/views/bar.blade.php');
 
         $this->assertSame(
             '/** file: bar.blade.php, line: 1 */{{ $foo }}',
+            $this->compiler->compileString('{{ $foo }}')
+        );
+    }
+
+    /** @test */
+    function it_shows_the_template_directory(): void
+    {
+        $this->compiler->setFileName('/var/www/resources/views/users/index.blade.php');
+
+        $this->assertSame(
+            '/** file: users/index.blade.php, line: 1 */{{ $foo }}',
             $this->compiler->compileString('{{ $foo }}')
         );
     }
