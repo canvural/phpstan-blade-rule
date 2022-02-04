@@ -49,5 +49,6 @@ class BladeToPHPCompilerTest extends PHPStanTestCase
         yield 'Two PHP tags in the same line' => ['two-php-tags-in-the-same-line'];
         yield 'Single line @php directive' => ['single-line-at-php-directive'];
         yield 'Multiple lines @php directive' => ['multiple-lines-at-php-directive'];
+        yield 'Multiple lines @php directive with comments' => ['multiple-lines-at-php-directive-with-comments'];
     }
 }
