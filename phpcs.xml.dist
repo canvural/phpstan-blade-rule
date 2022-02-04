@@ -14,6 +14,7 @@
     <file>tests</file>
 
     <exclude-pattern>tests/Rules/templates/*</exclude-pattern>
+    <exclude-pattern>tests/Compiler/data/*</exclude-pattern>
 
     <!-- Include full Doctrine Coding Standard -->
     <rule ref="Doctrine">

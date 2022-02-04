@@ -30,16 +30,16 @@ use Vural\PHPStanBladeRule\PHPParser\NodeVisitor\RemoveEnvVariableNodeVisitor;
 use Vural\PHPStanBladeRule\PHPParser\NodeVisitor\RemoveEscapeFunctionNodeVisitor;
 use Vural\PHPStanBladeRule\ValueObject\PhpFileContentsWithLineMap;
 
-use function array_map;
 use function array_merge;
 use function array_unshift;
+use function explode;
 use function getcwd;
 use function implode;
+use function preg_match;
 use function preg_match_all;
 use function preg_quote;
 use function preg_replace;
 use function sprintf;
-use function str_starts_with;
 use function trim;
 
 use const PHP_EOL;
@@ -134,23 +134,71 @@ final class BladeToPHPCompiler
     {
         $htmlMixedPHP = $this->compiler->compileString($fileContent);
 
-        preg_match_all(self::PHP_OPEN_CLOSE_TAGS_REGEX, $htmlMixedPHP, $matches);
+        $htmlMixedPHPLines = explode(PHP_EOL, $htmlMixedPHP);
+        $insidePHP         = false;
 
-        foreach ($matches[1] as $key => $match) {
-            if ($match !== '' || str_starts_with(trim($matches[2][$key]), 'echo $__env->make')) {
+        $phpContentLines = [];
+        foreach ($htmlMixedPHPLines as $line) {
+            preg_match('#(?P<comment>/\*\* file: .*?, line: \d+ \*/)(?P<tail>.*)#', $line, $matches);
+
+            if (! $matches || ! $matches['tail']) {
                 continue;
             }
 
-            $matches[1][$key] = $matches[1][$key - 1];
+            $comment = $matches['comment'];
+            $tail    = $matches['tail'];
+
+            while (true) {
+                if ($insidePHP) {
+                    preg_match('#(?P<php>.*?)\?>(?P<tail>.*)#', $tail, $matches);
+                    if (! $matches) {
+                        // All the tail is PHP. Saving the line and going to the next line.
+                        if (trim($tail)) {
+                            $phpContentLines[] = $comment;
+                            $phpContentLines[] = trim($tail);
+                        }
+
+                        break;
+                    }
+
+                    $insidePHP = false;
+
+                    if ($matches['php']) {
+                        $phpContentLines[] = $comment;
+                        $phpContentLines[] = $matches['php'];
+                    }
+
+                    if (! $matches['tail']) {
+                        // We close a PHP tag at the end of line (because no more tail). Going to the next line in HTML mode.
+                        break;
+                    }
+
+                    $tail = $matches['tail'];
+                } else {
+                    preg_match('#(?P<html>.*?)<\?php(?P<tail>.*)#', $tail, $matches);
+                    if (! $matches) {
+                        // No more PHP opening in this line, so the $tail is only HTML. Going to the next line.
+                        break;
+                    }
+
+                    $insidePHP = true;
+
+                    if (! $matches['tail']) {
+                        // We open a PHP tag at the end of line (because no more tail). Going to the next line in PHP mode.
+                        break;
+                    }
+
+                    // Continuing to match the tail in PHP mode…
+                    $tail = $matches['tail'];
+                }
+            }
         }
 
-        $phpContents = array_map(static fn ($a, $b) => $a . $b, $matches[1], $matches[2]);
-
-        if ($phpContents !== [] && $addPHPOpeningTag) {
-            array_unshift($phpContents, '<?php');
+        if ($phpContentLines && $addPHPOpeningTag) {
+            array_unshift($phpContentLines, '<?php');
         }
 
-        return implode(PHP_EOL, $phpContents);
+        return implode(PHP_EOL, $phpContentLines);
     }
 
     /**

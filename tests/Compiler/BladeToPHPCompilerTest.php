@@ -9,6 +9,8 @@ use PHPStan\Testing\PHPStanTestCase;
 use Vural\PHPStanBladeRule\Compiler\BladeToPHPCompiler;
 
 use function array_merge;
+use function file_get_contents;
+use function trim;
 
 /** @covers \Vural\PHPStanBladeRule\Compiler\FileNameAndLineNumberAddingPreCompiler */
 class BladeToPHPCompilerTest extends PHPStanTestCase
@@ -32,11 +34,11 @@ class BladeToPHPCompilerTest extends PHPStanTestCase
      * @test
      * @dataProvider basicTemplateProvider
      */
-    public function it_compiles_blade_content(string $fileName)
+    public function it_compiles_blade_content(string $fileName): void
     {
-        $result = $this->compiler->compileContent(__DIR__ . "/data/{$fileName}.blade.php", []);
+        $result = $this->compiler->compileContent(__DIR__ . '/data/' . $fileName . '.blade.php', []);
 
-        $this->assertEquals(trim(file_get_contents(__DIR__ . "/data/{$fileName}-blade-compiled.php")), trim($result->getPhpFileContents()));
+        $this->assertEquals(trim(file_get_contents(__DIR__ . '/data/' . $fileName . '-blade-compiled.php')), trim($result->getPhpFileContents()));
     }
 
     public function basicTemplateProvider(): Generator
