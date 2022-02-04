@@ -48,6 +48,7 @@ class BladeToPHPCompilerTest extends PHPStanTestCase
         yield 'Multiple lines template with HTML' => ['multiple-lines-with-html'];
         yield 'Two PHP tags in the same line' => ['two-php-tags-in-the-same-line'];
         yield 'Single line @php directive' => ['single-line-at-php-directive'];
+        yield 'Multiple lines method call' => ['multiple-lines-method-call'];
         yield 'Multiple lines @php directive' => ['multiple-lines-at-php-directive'];
         yield 'Multiple lines @php directive with comments' => ['multiple-lines-at-php-directive-with-comments'];
     }
