@@ -92,7 +92,7 @@ final class IncludeCompiler
                 $variablesDefinitions[] = sprintf('if (isset($%s)) { $%s = $%s; }', $variableName, $temporaryVariableName, $variableName);
                 $variablesDefinitions[] = sprintf('$%s = %s;', $variableName, $phpExpression);
 
-                $variablesReseting[] = sprintf('if (isset($%s)) { $%s = $%s; }', $temporaryVariableName, $variableName, $temporaryVariableName);
+                $variablesReseting[] = sprintf('if (isset($%s)) { $%s = $%s; } else { unset($%s); }', $temporaryVariableName, $variableName, $temporaryVariableName, $variableName);
             }
 
             return implode(PHP_EOL, $variablesDefinitions) . PHP_EOL . $includedContent . PHP_EOL . implode(PHP_EOL, $variablesReseting);

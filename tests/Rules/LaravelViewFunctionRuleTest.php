@@ -63,6 +63,10 @@ class LaravelViewFunctionRuleTest extends RuleTestCase
                 'Binary operation "+" between string and \'bar\' results in an error.',
                 13,
             ],
+            [
+                'Variable $foo might not be defined.',
+                13,
+            ],
         ]);
     }
 
