@@ -1,7 +1,9 @@
 parameters:
     templatePaths: []
+    bootstrapPath: './boostrap/app.php'
 parametersSchema:
     templatePaths: listOf(string())
+    bootstrapPath: string()
 services:
     errorFormatter.blade:
         class: Vural\PHPStanBladeRule\ErrorReporting\PHPStan\ErrorFormatter\BladeTemplateErrorFormatter
@@ -20,6 +22,7 @@ services:
             files: Illuminate\Filesystem\Filesystem()
             paths: %templatePaths%
             extensions: ['blade.php', 'svg']
+    - Vural\PHPStanBladeRule\Laravel\LaravelContainer
     - Vural\PHPStanBladeRule\Rules\ViewRuleHelper
     - Vural\PHPStanBladeRule\Blade\PhpLineToTemplateLineResolver
     - Vural\PHPStanBladeRule\ErrorReporting\Blade\TemplateErrorsFactory

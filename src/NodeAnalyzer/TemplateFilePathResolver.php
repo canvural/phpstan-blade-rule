@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Vural\PHPStanBladeRule\NodeAnalyzer;
 
-use Illuminate\View\FileViewFinder;
+use Illuminate\View\ViewFinderInterface;
 use Illuminate\View\ViewName;
 use InvalidArgumentException;
 use PhpParser\Node\Expr;
 use PHPStan\Analyser\Scope;
+use Vural\PHPStanBladeRule\Laravel\LaravelContainer;
 
 use function file_exists;
 use function is_string;
@@ -16,10 +17,13 @@ use function is_string;
 /** @see \Symplify\TemplatePHPStanCompiler\NodeAnalyzer\TemplateFilePathResolver */
 final class TemplateFilePathResolver
 {
+    private ViewFinderInterface $viewFinder;
+
     public function __construct(
-        private FileViewFinder $fileViewFinder,
+        LaravelContainer $laravelContainer,
         private ValueResolver $valueResolver,
     ) {
+        $this->viewFinder = $laravelContainer->viewFinder();
     }
 
     /** @return string[] */
@@ -32,7 +36,6 @@ final class TemplateFilePathResolver
         }
 
         $resolvedValue = $this->normalizeName($resolvedValue);
-
         if (file_exists($resolvedValue)) {
             return [$resolvedValue];
         }
@@ -54,7 +57,7 @@ final class TemplateFilePathResolver
     private function findView(string $view): ?string
     {
         try {
-            return $this->fileViewFinder->find($view);
+            return $this->viewFinder->find($view);
         } catch (InvalidArgumentException) {
             return null;
         }

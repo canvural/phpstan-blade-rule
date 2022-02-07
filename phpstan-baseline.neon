@@ -6,6 +6,11 @@ parameters:
 			path: src/Compiler/BladeToPHPCompiler.php
 
 		-
+			message: "#^Cannot call method getFinder\\(\\) on mixed\\.$#"
+			count: 1
+			path: src/Laravel/LaravelContainer.php
+
+		-
 			message: "#^Creating new PHPStan\\\\Rules\\\\Registry is not covered by backward compatibility promise\\. The class might change in a minor PHPStan version\\.$#"
 			count: 1
 			path: src/Rules/BladeRule.php
