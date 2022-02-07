@@ -27,14 +27,20 @@ use Vural\PHPStanBladeRule\Blade\PhpLineToTemplateLineResolver;
 use Vural\PHPStanBladeRule\PHPParser\NodeVisitor\AddLoopVarTypeToForeachNodeVisitor;
 use Vural\PHPStanBladeRule\PHPParser\NodeVisitor\RemoveEnvVariableNodeVisitor;
 use Vural\PHPStanBladeRule\PHPParser\NodeVisitor\RemoveEscapeFunctionNodeVisitor;
+use Vural\PHPStanBladeRule\ValueObject\BladeInclude;
 use Vural\PHPStanBladeRule\ValueObject\PhpFileContentsWithLineMap;
 
 use function array_merge;
 use function getcwd;
+use function implode;
 use function preg_match_all;
 use function preg_quote;
 use function preg_replace;
+use function rtrim;
 use function sprintf;
+use function ucfirst;
+
+use const PHP_EOL;
 
 final class BladeToPHPCompiler
 {
@@ -93,7 +99,7 @@ final class BladeToPHPCompiler
         while ($includes !== []) {
             foreach ($includes as $include) {
                 try {
-                    $includedFilePath     = $this->fileViewFinder->find($include);
+                    $includedFilePath     = $this->fileViewFinder->find($include->name);
                     $includedFileContents = $this->fileSystem->get($includedFilePath);
 
                     $preCompiledContents = $this->preCompiler->setFileName($includedFilePath)->compileString($includedFileContents);
@@ -102,11 +108,32 @@ final class BladeToPHPCompiler
                         $compiledContent,
                         false
                     );
+
+                    $variablesDefinitions = [];
+                    if ($include->variables) {
+                        $variables = $this->parser->parse('<?php ' . rtrim($include->variables, ',') . ';')[0]->expr->items;
+
+                        foreach ($variables as $arrayLine) {
+                            $variablesDefinitions[] = sprintf('if (isset($%s)) { $%s = $%s; }', $arrayLine->key->value, '__previous' . ucfirst($arrayLine->key->value), $arrayLine->key->value);
+                            $variablesDefinitions[] = sprintf('$%s = %s;', $arrayLine->key->value, $this->printerStandard->prettyPrintExpr($arrayLine->value));
+                        }
+                    }
+
+                    $variablesReseting = [];
+                    if ($include->variables) {
+                        $variables = $this->parser->parse('<?php ' . rtrim($include->variables, ',') . ';')[0]->expr->items;
+
+                        foreach ($variables as $arrayLine) {
+                            $variablesReseting[] = sprintf('if (isset($%s)) { $%s = $%s; }', '__previous' . ucfirst($arrayLine->key->value), $arrayLine->key->value, '__previous' . ucfirst($arrayLine->key->value));
+                        }
+                    }
+
+                    $includedContent = implode(PHP_EOL, $variablesDefinitions) . PHP_EOL . $includedContent . PHP_EOL . implode(PHP_EOL, $variablesReseting);
                 } catch (Throwable) {
                     $includedContent = '';
                 }
 
-                $rawPhpContent = preg_replace(sprintf(self::VIEW_INCLUDE_REPLACE_REGEX, preg_quote($include)), $includedContent, $rawPhpContent) ?? $rawPhpContent;
+                $rawPhpContent = preg_replace(sprintf(self::VIEW_INCLUDE_REPLACE_REGEX, preg_quote($include->name)), $includedContent, $rawPhpContent) ?? $rawPhpContent;
             }
 
             $includes = $this->getIncludes($rawPhpContent);
@@ -162,12 +189,17 @@ final class BladeToPHPCompiler
         return $nodeTraverser->traverse($stmts);
     }
 
-    /** @return string[] */
+    /** @return BladeInclude[] */
     private function getIncludes(string $compiled): array
     {
-        preg_match_all(self::VIEW_INCLUDE_REGEX, $compiled, $includes);
+        preg_match_all(self::VIEW_INCLUDE_REGEX, $compiled, $matches);
 
-        return $includes[1];
+        $includes = [];
+        foreach ($matches[1] as $i => $name) {
+            $includes[] = new BladeInclude($name, $matches[2][$i]);
+        }
+
+        return $includes;
     }
 
     private function setupBladeComponents(): void

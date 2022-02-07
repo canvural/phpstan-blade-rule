@@ -6,8 +6,8 @@ namespace Vural\PHPStanBladeRule\Tests\Rules;
 
 use PHPStan\Rules\Cast\EchoRule;
 use PHPStan\Rules\Operators\InvalidBinaryOperationRule;
-use PHPStan\Rules\Variables\DefinedVariableRule;
 use PHPStan\Rules\Rule;
+use PHPStan\Rules\Variables\DefinedVariableRule;
 use PHPStan\Testing\RuleTestCase;
 use Symplify\TemplatePHPStanCompiler\PHPStan\FileAnalyserProvider;
 use Symplify\TemplatePHPStanCompiler\TypeAnalyzer\TemplateVariableTypesResolver;
