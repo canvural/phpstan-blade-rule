@@ -7,7 +7,6 @@ namespace Vural\PHPStanBladeRule\Compiler;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Events\NullDispatcher;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
 use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\View\Engines\EngineResolver;
@@ -22,7 +21,6 @@ use PhpParser\PrettyPrinter\Standard;
 use PHPStan\ShouldNotHappenException;
 use Symplify\TemplatePHPStanCompiler\NodeFactory\VarDocNodeFactory;
 use Symplify\TemplatePHPStanCompiler\ValueObject\VariableAndType;
-use Throwable;
 use Vural\PHPStanBladeRule\Blade\PhpLineToTemplateLineResolver;
 use Vural\PHPStanBladeRule\PHPParser\NodeVisitor\AddLoopVarTypeToForeachNodeVisitor;
 use Vural\PHPStanBladeRule\PHPParser\NodeVisitor\RemoveEnvVariableNodeVisitor;
@@ -32,15 +30,10 @@ use Vural\PHPStanBladeRule\ValueObject\PhpFileContentsWithLineMap;
 
 use function array_merge;
 use function getcwd;
-use function implode;
 use function preg_match_all;
 use function preg_quote;
 use function preg_replace;
-use function rtrim;
 use function sprintf;
-use function ucfirst;
-
-use const PHP_EOL;
 
 final class BladeToPHPCompiler
 {
@@ -61,7 +54,7 @@ final class BladeToPHPCompiler
      * @phpstan-param array<int, array{class: string, alias: string, prefix: string}> $components
      */
     public function __construct(
-        private Filesystem $fileSystem,
+        private IncludeCompiler $includeCompiler,
         private BladeCompiler $compiler,
         private Standard $printerStandard,
         private VarDocNodeFactory $varDocNodeFactory,
@@ -98,40 +91,7 @@ final class BladeToPHPCompiler
         // Recursively fetch and compile includes
         while ($includes !== []) {
             foreach ($includes as $include) {
-                try {
-                    $includedFilePath     = $this->fileViewFinder->find($include->name);
-                    $includedFileContents = $this->fileSystem->get($includedFilePath);
-
-                    $preCompiledContents = $this->preCompiler->setFileName($includedFilePath)->compileString($includedFileContents);
-                    $compiledContent     = $this->compiler->compileString($preCompiledContents);
-                    $includedContent     = $this->phpContentExtractor->extract(
-                        $compiledContent,
-                        false
-                    );
-
-                    $variablesDefinitions = [];
-                    if ($include->variables) {
-                        $variables = $this->parser->parse('<?php ' . rtrim($include->variables, ',') . ';')[0]->expr->items;
-
-                        foreach ($variables as $arrayLine) {
-                            $variablesDefinitions[] = sprintf('if (isset($%s)) { $%s = $%s; }', $arrayLine->key->value, '__previous' . ucfirst($arrayLine->key->value), $arrayLine->key->value);
-                            $variablesDefinitions[] = sprintf('$%s = %s;', $arrayLine->key->value, $this->printerStandard->prettyPrintExpr($arrayLine->value));
-                        }
-                    }
-
-                    $variablesReseting = [];
-                    if ($include->variables) {
-                        $variables = $this->parser->parse('<?php ' . rtrim($include->variables, ',') . ';')[0]->expr->items;
-
-                        foreach ($variables as $arrayLine) {
-                            $variablesReseting[] = sprintf('if (isset($%s)) { $%s = $%s; }', '__previous' . ucfirst($arrayLine->key->value), $arrayLine->key->value, '__previous' . ucfirst($arrayLine->key->value));
-                        }
-                    }
-
-                    $includedContent = implode(PHP_EOL, $variablesDefinitions) . PHP_EOL . $includedContent . PHP_EOL . implode(PHP_EOL, $variablesReseting);
-                } catch (Throwable) {
-                    $includedContent = '';
-                }
+                $includedContent = $this->includeCompiler->decorateInclude($include);
 
                 $rawPhpContent = preg_replace(sprintf(self::VIEW_INCLUDE_REPLACE_REGEX, preg_quote($include->name)), $includedContent, $rawPhpContent) ?? $rawPhpContent;
             }

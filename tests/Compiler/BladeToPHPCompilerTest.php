@@ -19,6 +19,7 @@ use Symplify\TemplatePHPStanCompiler\ValueObject\VariableAndType;
 use Vural\PHPStanBladeRule\Blade\PhpLineToTemplateLineResolver;
 use Vural\PHPStanBladeRule\Compiler\BladeToPHPCompiler;
 use Vural\PHPStanBladeRule\Compiler\FileNameAndLineNumberAddingPreCompiler;
+use Vural\PHPStanBladeRule\Compiler\IncludeCompiler;
 use Vural\PHPStanBladeRule\Compiler\PhpContentExtractor;
 use Vural\PHPStanBladeRule\PHPParser\NodeVisitor\BladeLineNumberNodeVisitor;
 
@@ -39,15 +40,24 @@ class BladeToPHPCompilerTest extends TestCase
 
         $templatePaths = [__DIR__ . '/Fixture/BladeToPHPCompiler'];
 
+        $fileSystem = new Filesystem();
+
         $this->compiler = new BladeToPHPCompiler(
-            $fileSystem = new Filesystem(),
+            new IncludeCompiler(
+                new BladeCompiler($fileSystem, sys_get_temp_dir()),
+                new Standard(),
+                new FileViewFinder($fileSystem, $templatePaths),
+                $fileSystem,
+                new FileNameAndLineNumberAddingPreCompiler($templatePaths),
+                new PhpContentExtractor(),
+            ),
             new BladeCompiler($fileSystem, sys_get_temp_dir()),
             new Standard(),
             new VarDocNodeFactory(),
             new FileViewFinder($fileSystem, $templatePaths),
             new FileNameAndLineNumberAddingPreCompiler($templatePaths),
             new PhpLineToTemplateLineResolver(new BladeLineNumberNodeVisitor()),
-            new PhpContentExtractor()
+            new PhpContentExtractor(),
         );
 
         // Setup the variable names and types that'll be available to all templates

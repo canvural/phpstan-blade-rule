@@ -35,4 +35,5 @@ services:
             templatePaths: %templatePaths%
     - Vural\PHPStanBladeRule\Compiler\BladeToPHPCompiler
     - Vural\PHPStanBladeRule\Compiler\PhpContentExtractor
+    - Vural\PHPStanBladeRule\Compiler\IncludeCompiler
     - Vural\PHPStanBladeRule\PHPParser\NodeVisitor\BladeLineNumberNodeVisitor
