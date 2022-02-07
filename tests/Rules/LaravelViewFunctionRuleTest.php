@@ -6,6 +6,7 @@ namespace Vural\PHPStanBladeRule\Tests\Rules;
 
 use PHPStan\Rules\Cast\EchoRule;
 use PHPStan\Rules\Operators\InvalidBinaryOperationRule;
+use PHPStan\Rules\Variables\DefinedVariableRule;
 use PHPStan\Rules\Rule;
 use PHPStan\Testing\RuleTestCase;
 use Symplify\TemplatePHPStanCompiler\PHPStan\FileAnalyserProvider;
@@ -30,6 +31,7 @@ class LaravelViewFunctionRuleTest extends RuleTestCase
             [
                 self::getContainer()->getByType(InvalidBinaryOperationRule::class),
                 self::getContainer()->getByType(EchoRule::class),
+                self::getContainer()->getByType(DefinedVariableRule::class),
             ],
             self::getContainer()->getByType(BladeViewMethodsMatcher::class),
             self::getContainer()->getByType(LaravelViewFunctionMatcher::class),
@@ -56,6 +58,10 @@ class LaravelViewFunctionRuleTest extends RuleTestCase
             [
                 'Binary operation "+" between string and 10 results in an error.',
                 11,
+            ],
+            [
+                'Binary operation "+" between string and \'bar\' results in an error.',
+                13,
             ],
         ]);
     }
