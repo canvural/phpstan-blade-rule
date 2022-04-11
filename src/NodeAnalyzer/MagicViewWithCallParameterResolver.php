@@ -35,7 +35,14 @@ final class MagicViewWithCallParameterResolver
 
             if ($methodName !== null) {
                 if ($methodName === 'with') {
-                    $result[] = new Node\Expr\ArrayItem($parent->getArgs()[1]->value, $parent->getArgs()[0]->value);
+                    if (($arguments = $parent->getArgs()[0]->value) instanceof Node\Expr\Array_) {
+                        /** @var Node\Expr\ArrayItem $value */
+                        foreach ($arguments->items as $value) {
+                            $result[] = new Node\Expr\ArrayItem($value->value, $value->key);
+                        }
+                    } else {
+                        $result[] = new Node\Expr\ArrayItem($parent->getArgs()[1]->value, $parent->getArgs()[0]->value);
+                    }
                 } elseif (str_starts_with($methodName, 'with')) {
                     $result[] = new Node\Expr\ArrayItem($parent->getArgs()[0]->value, new Node\Scalar\String_(Str::camel(substr($methodName, 4))));
                 }
