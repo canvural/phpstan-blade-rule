@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use PhpParser\Node;
 use Symplify\Astral\Naming\SimpleNameResolver;
 
+use function assert;
 use function str_starts_with;
 use function substr;
 
@@ -36,7 +37,7 @@ final class MagicViewWithCallParameterResolver
             if ($methodName !== null) {
                 if ($methodName === 'with') {
                     if (($arguments = $parent->getArgs()[0]->value) instanceof Node\Expr\Array_) {
-                        /** @var Node\Expr\ArrayItem $value */
+                        assert($value instanceof Node\Expr\ArrayItem);
                         foreach ($arguments->items as $value) {
                             $result[] = new Node\Expr\ArrayItem($value->value, $value->key);
                         }
