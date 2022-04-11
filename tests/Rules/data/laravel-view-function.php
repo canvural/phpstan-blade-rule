@@ -21,4 +21,4 @@ view('file_with_include', ['foo' => 'foo']);
 
 view('file_with_recursive_include', ['foo' => 'foo']);
 
-view('foo')->with(['foo' => 'bar']);
+view('bar')->with(['foo' => 'bar']);
