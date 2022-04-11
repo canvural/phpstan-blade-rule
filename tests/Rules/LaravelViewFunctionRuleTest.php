@@ -107,6 +107,10 @@ class LaravelViewFunctionRuleTest extends RuleTestCase
                 'Undefined variable: $bar',
                 22,
             ],
+            [
+                'Binary operation "+" between string and \'bar\' results in an error.',
+                24,
+            ],
         ]);
     }
 
