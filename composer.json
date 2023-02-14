@@ -11,9 +11,9 @@
     ],
     "require": {
         "php": "^8.0",
-        "illuminate/contracts": "^8.82 || ^9.0",
-        "illuminate/filesystem": "^8.82 || ^9.0",
-        "illuminate/view": "^8.82 || ^9",
+        "illuminate/contracts": "^8.82 || ^9.0 || ^10.0",
+        "illuminate/filesystem": "^8.82 || ^9.0 || ^10.0",
+        "illuminate/view": "^8.82 || ^9 || ^10.0",
         "phpstan/phpstan": "^1.7",
         "reveal/template-phpstan-compiler": "^0.2"
     },
