@@ -91,7 +91,7 @@ final class ViewRuleHelper
 
         $fileAnalyser = $this->fileAnalyserProvider->provide();
 
-        $fileAnalyserResult = $fileAnalyser->analyseFile($tmpFilePath, [], $this->registry, null);
+        $fileAnalyserResult = $fileAnalyser->analyseFile($tmpFilePath, [], $this->registry, /* TODO set collector registry */, null);
 
         $ruleErrors = $fileAnalyserResult->getErrors();
 

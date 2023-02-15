@@ -4,16 +4,16 @@
     "type": "phpstan-extension",
     "require": {
         "php": "^8.0",
-        "phpstan/phpstan": "^1.4.6",
-        "illuminate/view": "^8.82 || ^9",
+        "phpstan/phpstan": "^1.8.9",
+        "illuminate/view": "^8.82 || ^9.0 || ^10.0",
         "symplify/template-phpstan-compiler": "^10.0.20",
-        "illuminate/filesystem": "^8.82 || ^9.0",
-        "illuminate/contracts": "^8.82 || ^9.0"
+        "illuminate/filesystem": "^8.82 || ^9.0 || ^10.0",
+        "illuminate/contracts": "^8.82 || ^9.0 || ^10.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5",
         "roave/security-advisories": "dev-latest",
-        "orchestra/testbench": "^6.24 || ^7.0",
+        "orchestra/testbench": "^6.24 || ^7.0 || ^8.0",
         "doctrine/coding-standard": "^9.0",
         "symplify/easy-testing": "^10.0"
     },
