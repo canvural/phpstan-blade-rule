@@ -11,16 +11,16 @@
     ],
     "require": {
         "php": "^8.0",
-        "illuminate/contracts": "^8.82 || ^9.0",
-        "illuminate/filesystem": "^8.82 || ^9.0",
-        "illuminate/view": "^8.82 || ^9",
+        "illuminate/contracts": "^8.82 || ^9.0 || ^10.0",
+        "illuminate/filesystem": "^8.82 || ^9.0 || ^10.0",
+        "illuminate/view": "^8.82 || ^9.9 || ^10.0",
         "phpstan/phpstan": "^1.8.9",
         "symplify/template-phpstan-compiler": "^10.0.20"
     },
     "require-dev": {
         "doctrine/coding-standard": "^9.0",
         "ergebnis/composer-normalize": "^2.24",
-        "orchestra/testbench": "^6.24 || ^7.0",
+        "orchestra/testbench": "^6.24 || ^7.0 || ^8.0",
         "phpunit/phpunit": "^9.5",
         "roave/security-advisories": "dev-latest",
         "symplify/easy-testing": "^10.0"
