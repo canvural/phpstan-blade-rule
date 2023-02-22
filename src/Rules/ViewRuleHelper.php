@@ -8,11 +8,12 @@ use PhpParser\Node;
 use PHPStan\Analyser\Scope;
 use PHPStan\Rules\Registry;
 use PHPStan\Rules\RuleError;
+use PHPStan\Collectors\Registry as CollectorRegistry;
 use PHPStan\ShouldNotHappenException;
-use Reveal\TemplatePHPStanCompiler\PHPStan\FileAnalyserProvider;
-use Reveal\TemplatePHPStanCompiler\TypeAnalyzer\TemplateVariableTypesResolver;
-use Reveal\TemplatePHPStanCompiler\ValueObject\RenderTemplateWithParameters;
-use Reveal\TemplatePHPStanCompiler\ValueObject\VariableAndType;
+use Symplify\TemplatePHPStanCompiler\PHPStan\FileAnalyserProvider;
+use Symplify\TemplatePHPStanCompiler\TypeAnalyzer\TemplateVariableTypesResolver;
+use Symplify\TemplatePHPStanCompiler\ValueObject\RenderTemplateWithParameters;
+use Symplify\TemplatePHPStanCompiler\ValueObject\VariableAndType;
 use Vural\PHPStanBladeRule\Compiler\BladeToPHPCompiler;
 use Vural\PHPStanBladeRule\ErrorReporting\Blade\TemplateErrorsFactory;
 
@@ -38,6 +39,7 @@ final class ViewRuleHelper
         private FileAnalyserProvider $fileAnalyserProvider,
         private TemplateErrorsFactory $templateErrorsFactory,
         private BladeToPHPCompiler $bladeToPhpCompiler,
+        private CollectorRegistry $collectorRegistry
     ) {
     }
 
@@ -98,7 +100,7 @@ final class ViewRuleHelper
 
         $fileAnalyser = $this->fileAnalyserProvider->provide();
 
-        $fileAnalyserResult = $fileAnalyser->analyseFile($tmpFilePath, [], $this->registry, null);
+        $fileAnalyserResult = $fileAnalyser->analyseFile($tmpFilePath, [], $this->registry, $this->collectorRegistry, null);
 
         $ruleErrors = $fileAnalyserResult->getErrors();
 

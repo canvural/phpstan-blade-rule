@@ -7,8 +7,8 @@ namespace Vural\PHPStanBladeRule\Tests\Rules;
 use PHPStan\Rules\Operators\InvalidBinaryOperationRule;
 use PHPStan\Rules\Rule;
 use PHPStan\Testing\RuleTestCase;
-use Reveal\TemplatePHPStanCompiler\PHPStan\FileAnalyserProvider;
-use Reveal\TemplatePHPStanCompiler\TypeAnalyzer\TemplateVariableTypesResolver;
+use Symplify\TemplatePHPStanCompiler\PHPStan\FileAnalyserProvider;
+use Symplify\TemplatePHPStanCompiler\TypeAnalyzer\TemplateVariableTypesResolver;
 use Vural\PHPStanBladeRule\Compiler\BladeToPHPCompiler;
 use Vural\PHPStanBladeRule\ErrorReporting\Blade\TemplateErrorsFactory;
 use Vural\PHPStanBladeRule\NodeAnalyzer\BladeViewMethodsMatcher;
@@ -29,12 +29,7 @@ class BladeViewRuleTest extends RuleTestCase
             [self::getContainer()->getByType(InvalidBinaryOperationRule::class)],
             self::getContainer()->getByType(BladeViewMethodsMatcher::class),
             self::getContainer()->getByType(LaravelViewFunctionMatcher::class),
-            new ViewRuleHelper(
-                self::getContainer()->getByType(TemplateVariableTypesResolver::class),
-                self::getContainer()->getByType(FileAnalyserProvider::class),
-                self::getContainer()->getByType(TemplateErrorsFactory::class),
-                self::getContainer()->getByType(BladeToPHPCompiler::class),
-            )
+            self::getContainer()->getByType(ViewRuleHelper::class),
         );
     }
 

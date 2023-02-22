@@ -11,7 +11,7 @@ parameters:
 			path: src/PHPParser/NodeVisitor/ViewFunctionArgumentsNodeVisitor.php
 
 		-
-			message: "#^Creating new PHPStan\\\\Rules\\\\Registry is not covered by backward compatibility promise\\. The class might change in a minor PHPStan version\\.$#"
+			message: "#^Creating new PHPStan\\\\Rules\\\\DirectRegistry is not covered by backward compatibility promise\\. The class might change in a minor PHPStan version\\.$#"
 			count: 1
 			path: src/Rules/BladeRule.php
 
