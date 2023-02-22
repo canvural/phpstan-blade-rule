@@ -14,7 +14,7 @@
         "illuminate/contracts": "^8.82 || ^9.0",
         "illuminate/filesystem": "^8.82 || ^9.0",
         "illuminate/view": "^8.82 || ^9",
-        "phpstan/phpstan": "^1.7",
+        "phpstan/phpstan": "^1.8.9",
         "symplify/template-phpstan-compiler": "^10.0.20"
     },
     "require-dev": {

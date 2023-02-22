@@ -29,12 +29,7 @@ class BladeViewRuleTest extends RuleTestCase
             [self::getContainer()->getByType(InvalidBinaryOperationRule::class)],
             self::getContainer()->getByType(BladeViewMethodsMatcher::class),
             self::getContainer()->getByType(LaravelViewFunctionMatcher::class),
-            new ViewRuleHelper(
-                self::getContainer()->getByType(TemplateVariableTypesResolver::class),
-                self::getContainer()->getByType(FileAnalyserProvider::class),
-                self::getContainer()->getByType(TemplateErrorsFactory::class),
-                self::getContainer()->getByType(BladeToPHPCompiler::class),
-            )
+            self::getContainer()->getByType(ViewRuleHelper::class),
         );
     }
 
